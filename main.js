@@ -30,6 +30,10 @@ function flip_pancakes(pancakes, index) {
 
 function pancakeSort(arr) {
     let n = arr.length;
+    //Si el array tiene menos de 2 elementos, no se hace nada
+    if(n < 2) return arr;
+    //Si el array tiene 2 elementos, se invierte si el primero es mayor que el segundo
+    if(n === 2) return arr[0] > arr[1] ? arr.reverse() : arr;
     for (let curr_size = n; curr_size > 1; --curr_size) {
         let largest_index = find_largest_pancake(arr, curr_size);
         if (largest_index !== curr_size - 1) {
