@@ -14,13 +14,13 @@ function fill_pancakes(num_pancakes) {
 }
 
 function find_largest_pancake(pancakes, n) {
-    let mi = 0;
+    let largest_index = 0;
     for (let i = 0; i < n; i++) {
-        if (pancakes[i] > pancakes[mi]) {
-            mi = i;
+        if (pancakes[i] > pancakes[largest_index]) {
+            largest_index = i;
         }
     }
-    return mi;
+    return largest_index;
 }
 
 function flip_pancakes(pancakes, index) {
@@ -31,10 +31,10 @@ function flip_pancakes(pancakes, index) {
 function pancakeSort(arr) {
     let n = arr.length;
     for (let curr_size = n; curr_size > 1; --curr_size) {
-        let mi = find_largest_pancake(arr, curr_size);
-        if (mi !== curr_size - 1) {
-            if (mi !== 0) {
-                arr = flip_pancakes(arr, mi);
+        let largest_index = find_largest_pancake(arr, curr_size);
+        if (largest_index !== curr_size - 1) {
+            if (largest_index !== 0) {
+                arr = flip_pancakes(arr, largest_index);
             }
             arr = flip_pancakes(arr, curr_size - 1);
         }
@@ -54,7 +54,7 @@ function is_pancake_sorted(pancakes) {
 const pancakes = fill_pancakes(26);
 
 const sortedPancake = pancakeSort(pancakes);
-console.log(pancakes);
-console.log(sortedPancake);
+console.log("ORIGINAL: "+ pancakes);
+console.log("SORTED: " + sortedPancake);
 console.log(performance.now().toFixed(2)+"ms");
 console.log(is_pancake_sorted(sortedPancake));
