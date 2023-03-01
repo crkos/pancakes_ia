@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 function fill_pancakes(num_pancakes) {
     const dict = "abcdefghijklmnopqrstuvwxyz";
     const empty_pancakes = [];
@@ -13,39 +14,10 @@ function fill_pancakes(num_pancakes) {
     return empty_pancakes;
 }
 
-function find_largest_pancake(pancakes, n) {
-    let largest_index = 0;
-    for (let i = 0; i < n; i++) {
-        if (pancakes[i] > pancakes[largest_index]) {
-            largest_index = i;
-        }
-    }
-    return largest_index;
-}
-
 function flip_pancakes(pancakes, index) {
     if (pancakes.length < 2) return pancakes;
     return pancakes.slice(0, index + 1).reverse().concat(pancakes.slice(index + 1));
 }
-
-function pancakeSort(arr) {
-    let n = arr.length;
-    //Si el array tiene menos de 2 elementos, no se hace nada
-    if(n < 2) return arr;
-    //Si el array tiene 2 elementos, se invierte si el primero es mayor que el segundo
-    if(n === 2) return arr[0] > arr[1] ? arr.reverse() : arr;
-    for (let curr_size = n; curr_size > 1; --curr_size) {
-        let largest_index = find_largest_pancake(arr, curr_size);
-        if (largest_index !== curr_size - 1) {
-            if (largest_index !== 0) {
-                arr = flip_pancakes(arr, largest_index);
-            }
-            arr = flip_pancakes(arr, curr_size - 1);
-        }
-    }
-    return arr;
-}
-
 function is_pancake_sorted(pancakes) {
     for (let i = 1; i < pancakes.length; i++) {
         if (pancakes[i] < pancakes[i - 1]) {
@@ -55,10 +27,45 @@ function is_pancake_sorted(pancakes) {
     return true;
 }
 
-const pancakes = fill_pancakes(26);
+function hashPermutation(permutation) {
+    const hash = crypto.createHash('md5');
+    hash.update(permutation.join(','));
+    return hash.digest('hex');
+}
 
-const sortedPancake = pancakeSort(pancakes);
-console.log("ORIGINAL: "+ pancakes);
-console.log("SORTED: " + sortedPancake);
+function busquedaAmplitud(permutacionInicial) {
+    const n = permutacionInicial.length;
+    const visitados = new Set();
+    visitados.add(hashPermutation(permutacionInicial));
+    const queue = [{ permutation: permutacionInicial, index: 0 }];
+    const D = {};
+    const P = {};
+
+    while (queue.length > 0) {
+        const { permutation, index } = queue.shift();
+        if (is_pancake_sorted(permutation)) {
+            // si se encuentra la permutación ordenada, se detiene la búsqueda
+            return permutation;
+        }
+        for (let i = 2; i <= n; i++) {
+            const sucesor = flip_pancakes(permutation.slice(), i - 1);
+            const sucesorHash = hashPermutation(sucesor);
+            if (!visitados.has(sucesorHash)) {
+                visitados.add(sucesorHash);
+                D[sucesorHash] = D[hashPermutation(permutation)] + 1;
+                P[sucesorHash] = permutation;
+                queue.push({ permutation: sucesor, index: i - 1 });
+            }
+        }
+    }
+
+    // si no se encuentra la permutación ordenada, devuelve la permutación inicial
+    return permutacionInicial;
+}
+
+const permutacionInicial = fill_pancakes(8);
+console.log("PERMUTACIÓN INICIAL:", permutacionInicial);
+const permutacionOrdenada = busquedaAmplitud(permutacionInicial);
+console.log("PERMUTACIÓN ORDENADA:", permutacionOrdenada);
 console.log(performance.now().toFixed(2)+"ms");
-console.log(is_pancake_sorted(sortedPancake));
+console.log(is_pancake_sorted(permutacionOrdenada));
