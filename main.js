@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+
 function fill_pancakes(num_pancakes) {
     const dict = "abcdefghijklmnopqrstuvwxyz";
     const empty_pancakes = [];
@@ -18,6 +19,7 @@ function flip_pancakes(pancakes, index) {
     if (pancakes.length < 2) return pancakes;
     return pancakes.slice(0, index + 1).reverse().concat(pancakes.slice(index + 1));
 }
+
 function is_pancake_sorted(pancakes) {
     for (let i = 1; i < pancakes.length; i++) {
         if (pancakes[i] < pancakes[i - 1]) {
@@ -33,18 +35,23 @@ function hashPermutation(permutation) {
     return hash.digest('hex');
 }
 
+
 function busquedaAmplitud(permutacionInicial) {
     const n = permutacionInicial.length;
     const visitados = new Set();
     visitados.add(hashPermutation(permutacionInicial));
-    const queue = [{ permutation: permutacionInicial, index: 0 }];
+    const queue = [{ permutation: permutacionInicial, index: 0, level: 0 }];
     const D = {};
     const P = {};
 
     while (queue.length > 0) {
-        const { permutation, index } = queue.shift();
+        const { permutation, index, level } = queue.shift();
         if (is_pancake_sorted(permutation)) {
             // si se encuentra la permutación ordenada, se detiene la búsqueda
+            console.log("NÚMERO DE NODOS EXPANDIDOS:", visitados.size)
+            console.log("NIVEL:", level)
+            console.log("NÚMERO DE NODOS EN LA COLA:", queue.length)
+            console.log("INDICE:", index)
             return permutation;
         }
         for (let i = 2; i <= n; i++) {
@@ -54,18 +61,17 @@ function busquedaAmplitud(permutacionInicial) {
                 visitados.add(sucesorHash);
                 D[sucesorHash] = D[hashPermutation(permutation)] + 1;
                 P[sucesorHash] = permutation;
-                queue.push({ permutation: sucesor, index: i - 1 });
+                queue.push({ permutation: sucesor, index: i - 1, level: level + 1 });
             }
         }
     }
-
     // si no se encuentra la permutación ordenada, devuelve la permutación inicial
     return permutacionInicial;
 }
 
-const permutacionInicial = fill_pancakes(8);
+const permutacionInicial = fill_pancakes(7);
+
 console.log("PERMUTACIÓN INICIAL:", permutacionInicial);
 const permutacionOrdenada = busquedaAmplitud(permutacionInicial);
 console.log("PERMUTACIÓN ORDENADA:", permutacionOrdenada);
-console.log(performance.now().toFixed(2)+"ms");
-console.log(is_pancake_sorted(permutacionOrdenada));
+
