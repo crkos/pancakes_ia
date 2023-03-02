@@ -42,7 +42,6 @@ function pancakeSort(arr) {
             }
             arr = flip_pancakes(arr, curr_size - 1);
         }
-        veces++;
         if (is_pancake_sorted(arr)) break;
     }
     return arr;
