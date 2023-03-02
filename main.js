@@ -42,6 +42,8 @@ function pancakeSort(arr) {
             }
             arr = flip_pancakes(arr, curr_size - 1);
         }
+        veces++;
+        if (is_pancake_sorted(arr)) break;
     }
     return arr;
 }
@@ -55,7 +57,7 @@ function is_pancake_sorted(pancakes) {
     return true;
 }
 
-const pancakes = fill_pancakes(26);
+const pancakes = fill_pancakes(10);
 
 const sortedPancake = pancakeSort(pancakes);
 console.log("ORIGINAL: "+ pancakes);
