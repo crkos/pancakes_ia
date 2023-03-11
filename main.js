@@ -17,7 +17,11 @@ function fill_pancakes(num_pancakes) {
 
 function flip_pancakes(pancakes, index) {
     if (pancakes.length < 2) return pancakes;
-    return pancakes.slice(0, index + 1).reverse().concat(pancakes.slice(index + 1));
+    const flipped = [...pancakes.slice(0, index + 1)].reverse();
+    if (index < pancakes.length - 1) {
+        return flipped.concat(pancakes.slice(index + 1));
+    }
+    return flipped;
 }
 
 function is_pancake_sorted(pancakes) {
@@ -43,6 +47,9 @@ function busquedaProfundidad(permutacionInicial) {
     const stack = [{ permutation: permutacionInicial, index: 0, level: 0 }];
     const D = {};
     const P = {};
+    let limite = Number.MAX_VALUE;
+    let permutacionOrdenada = null;
+    let contador = 0;
 
     while (stack.length > 0) {
         const { permutation, index, level } = stack.pop();
@@ -51,7 +58,12 @@ function busquedaProfundidad(permutacionInicial) {
             console.log("NIVEL:", level)
             console.log("NÚMERO DE NODOS EN LA PILA:", stack.length)
             console.log("INDICE:", index)
-            return permutation;
+            permutacionOrdenada = permutation; // Almacenar la permutación ordenada encontrada
+            contador++;
+            continue; // Detener la búsqueda en profundidad
+        }
+        if (level >= limite) {
+            continue;
         }
         for (let i = n; i >= 2; i--) {
             const sucesor = flip_pancakes(permutation.slice(), i - 1);
@@ -60,14 +72,25 @@ function busquedaProfundidad(permutacionInicial) {
                 visitados.add(sucesorHash);
                 D[sucesorHash] = D[hashPermutation(permutation)] + 1;
                 P[sucesorHash] = permutation;
+                if (is_pancake_sorted(sucesor)) {
+                    console.log("NÚMERO DE NODOS EXPANDIDOS:", visitados.size)
+                    console.log("NIVEL:", level + 1)
+                    console.log("NÚMERO DE NODOS EN LA PILA:", stack.length)
+                    console.log("INDICE:", i - 1)
+                    permutacionOrdenada = sucesor; // Almacenar la permutación ordenada encontrada
+                    contador++;
+                    continue; // Detener la búsqueda en profundidad
+                }
                 stack.push({ permutation: sucesor, index: i - 1, level: level + 1 });
             }
         }
+        limite = level + 2;
     }
-    return permutacionInicial;
+    console.log("NÚMERO DE SOLUCIONES:", contador)
+    return permutacionOrdenada; // Devolver la permutación ordenada encontrada
 }
 
-const permutacionInicial = fill_pancakes(9);
+const permutacionInicial = fill_pancakes(10);
 
 console.log("PERMUTACIÓN INICIAL:", permutacionInicial);
 const permutacionOrdenada = busquedaProfundidad(permutacionInicial);
