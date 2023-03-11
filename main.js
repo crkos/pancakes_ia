@@ -36,42 +36,40 @@ function hashPermutation(permutation) {
 }
 
 
-function busquedaAmplitud(permutacionInicial) {
+function busquedaProfundidad(permutacionInicial) {
     const n = permutacionInicial.length;
     const visitados = new Set();
     visitados.add(hashPermutation(permutacionInicial));
-    const queue = [{ permutation: permutacionInicial, index: 0, level: 0 }];
+    const stack = [{ permutation: permutacionInicial, index: 0, level: 0 }];
     const D = {};
     const P = {};
 
-    while (queue.length > 0) {
-        const { permutation, index, level } = queue.shift();
+    while (stack.length > 0) {
+        const { permutation, index, level } = stack.pop();
         if (is_pancake_sorted(permutation)) {
-            // si se encuentra la permutación ordenada, se detiene la búsqueda
             console.log("NÚMERO DE NODOS EXPANDIDOS:", visitados.size)
             console.log("NIVEL:", level)
-            console.log("NÚMERO DE NODOS EN LA COLA:", queue.length)
+            console.log("NÚMERO DE NODOS EN LA PILA:", stack.length)
             console.log("INDICE:", index)
             return permutation;
         }
-        for (let i = 2; i <= n; i++) {
+        for (let i = n; i >= 2; i--) {
             const sucesor = flip_pancakes(permutation.slice(), i - 1);
             const sucesorHash = hashPermutation(sucesor);
             if (!visitados.has(sucesorHash)) {
                 visitados.add(sucesorHash);
                 D[sucesorHash] = D[hashPermutation(permutation)] + 1;
                 P[sucesorHash] = permutation;
-                queue.push({ permutation: sucesor, index: i - 1, level: level + 1 });
+                stack.push({ permutation: sucesor, index: i - 1, level: level + 1 });
             }
         }
     }
-    // si no se encuentra la permutación ordenada, devuelve la permutación inicial
     return permutacionInicial;
 }
 
-const permutacionInicial = fill_pancakes(7);
+const permutacionInicial = fill_pancakes(9);
 
 console.log("PERMUTACIÓN INICIAL:", permutacionInicial);
-const permutacionOrdenada = busquedaAmplitud(permutacionInicial);
+const permutacionOrdenada = busquedaProfundidad(permutacionInicial);
 console.log("PERMUTACIÓN ORDENADA:", permutacionOrdenada);
 
